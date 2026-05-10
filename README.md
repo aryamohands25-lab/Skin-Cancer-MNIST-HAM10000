@@ -273,18 +273,4 @@ opencv-python-headless==4.8.0
 ✔ Streamlit Deployment  
 ✔ End-to-End ML Pipeline
 
----
 
-# Future Improvements
-
-- Use transfer learning models such as ResNet50 or EfficientNet
-- Integrate real-time dermatoscopic image capture
-- Add dermatologist feedback loop
-- Deploy on cloud platforms
-- Improve class balancing techniques
-
----
-
-# Author
-
-Developed as part of a deep learning and medical image analysis project for automated skin cancer classification.
