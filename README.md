@@ -1,11 +1,12 @@
-# Skin-Cancer-MNIST-HAM10000
 # Skin Cancer Classification System
 
 A deep learning project that classifies dermatoscopic skin lesion images into **7 diagnostic categories** using the **HAM10000 dataset**, with an interactive **Streamlit web application** for inference and prediction visualization.
 
+🚀 **Live Demo: [skin-cancer-ham10000.streamlit.app](https://skin-cancer-ham10000.streamlit.app)**
+
 ---
 
-# Overview
+## Overview
 
 This project implements a complete deep learning pipeline for **skin lesion classification** using a custom **Convolutional Neural Network (CNN)**. The system assists in identifying potentially malignant skin lesions by learning visual patterns from dermatoscopic images.
 
@@ -22,18 +23,19 @@ The project covers:
 
 ---
 
-# Dataset
+## Dataset
 
 Dataset used: **HAM10000 (Human Against Machine with 10000 training images)**
 
-Kaggle Dataset:  
-https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000
+Kaggle Dataset: https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000
 
-The project uses the **28×28 RGB CSV version** of the dataset.
+The project uses the **28×28 RGB CSV version** (`hmnist_28_28_RGB.csv`) of the dataset.
+
+> **Note:** Only the CSV file is needed for training (~180 MB). The full dataset zip (~5.2 GB) includes image folders that are not used by this pipeline.
 
 ---
 
-# Lesion Classes
+## Lesion Classes
 
 | Code | Full Name | Nature |
 |---|---|---|
@@ -41,195 +43,103 @@ The project uses the **28×28 RGB CSV version** of the dataset.
 | `bcc` | Basal Cell Carcinoma | Malignant |
 | `bkl` | Benign Keratosis | Benign |
 | `df` | Dermatofibroma | Benign |
-| `mel` | Melanoma | Malignant |
 | `nv` | Melanocytic Nevi | Benign |
 | `vasc` | Vascular Lesions | Benign |
+| `mel` | Melanoma | Malignant |
 
 ---
 
-# Project Pipeline
+## Project Pipeline
 
-## 1. Data Loading & Exploratory Data Analysis (EDA)
+### 1. Data Loading & EDA
 
-Performed detailed exploratory analysis including:
-
-- Class distribution analysis
-- Imbalance ratio visualization
+- Class distribution analysis (imbalance ratio: 58.3x)
 - RGB channel distribution plots
 - Pixel intensity analysis
-- Mean image visualization for each class
+- Mean image visualization per class
 
----
+### 2. Preprocessing
 
-## 2. Preprocessing
-
-Preprocessing steps include:
-
-- Duplicate removal
-- Pixel normalization to `[0, 1]`
-- Stratified `80/20` train-test split
-- Label encoding
+- Duplicate removal (2 rows removed)
+- Pixel normalisation to `[0, 1]`
+- Stratified 80/20 train-test split
 - Class weight computation for imbalance handling
 
----
+### 3. Data Augmentation
 
-## 3. Data Augmentation
+Applied via `ImageDataGenerator`:
 
-To improve generalization and reduce overfitting, the following augmentations are applied using `ImageDataGenerator`:
+- Random rotation (±20°)
+- Horizontal and vertical flip
+- Width and height shifts (±10%)
+- Zoom (±10%)
 
-- Random rotation
-- Horizontal flip
-- Vertical flip
-- Width and height shifts
-- Zoom transformations
+### 4. CNN Architecture
 
----
+3 convolutional blocks with progressively increasing depth:
 
-## 4. CNN Model Architecture
-
-The proposed CNN contains **3 convolutional blocks** with progressively increasing depth.
-
-### Architecture
-
-```text
-Input Image (28×28×3)
+```
+Input (28×28×3)
         ↓
-
-Block 1
-Conv2D(32) × 2
-BatchNormalization
-MaxPooling2D
-Dropout(0.25)
-
+Block 1: Conv2D(32)×2 → BatchNorm → MaxPool → Dropout(0.25)
         ↓
-
-Block 2
-Conv2D(64) × 2
-BatchNormalization
-MaxPooling2D
-Dropout(0.30)
-
+Block 2: Conv2D(64)×2 → BatchNorm → MaxPool → Dropout(0.30)
         ↓
-
-Block 3
-Conv2D(128)
-BatchNormalization
-MaxPooling2D
-Dropout(0.40)
-
+Block 3: Conv2D(128)  → BatchNorm → MaxPool → Dropout(0.40)
         ↓
-
-Flatten
-
-        ↓
-
-Dense(256)
-Dropout
-
-        ↓
-
-Dense(128)
-
-        ↓
-
-Softmax(7)
+Flatten → Dense(256) → Dense(128) → Softmax(7)
 ```
 
-### Compilation
+- **Optimizer:** Adam (lr=0.001)
+- **Loss:** Categorical Cross-Entropy
+- **Total params:** 471,207 (1.80 MB)
 
-- **Optimizer:** Adam
-- **Learning Rate:** 0.001
-- **Loss Function:** Categorical Cross-Entropy
-- **Metric:** Accuracy
+### 5. Training
 
----
+- Max epochs: 100 with early stopping (patience=15)
+- Learning rate reduction via `ReduceLROnPlateau`
+- Best model saved via `ModelCheckpoint`
 
-## 5. Model Training
+### 6. Results
 
-Training configuration:
+| Model | Accuracy |
+|---|---|
+| Random Forest | 72.6% |
+| KNN (k=5) | 70.8% |
+| Logistic Regression | 70.0% |
+| CNN (ours) | 55.9% |
 
-- Maximum epochs: `100`
-- Early stopping with patience `15`
-- Learning rate reduction using `ReduceLROnPlateau`
-- Best model saving using `ModelCheckpoint`
+> The CNN's lower overall accuracy reflects class weighting — it is penalised heavily for missing rare classes, trading raw accuracy for more balanced per-class recall. Its weighted precision (0.74) exceeds all baselines.
 
----
+### 7. Explainability
 
-## 6. Evaluation
+Grad-CAM heatmaps highlight the image regions the model attends to when making predictions.
 
-The trained model is evaluated using:
+### 8. Baseline Comparison
 
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- Confusion Matrix
-- Normalized Confusion Matrix
-- ROC Curves (One-vs-Rest)
-- Per-class AUC scores
+CNN compared against Logistic Regression, Random Forest, and KNN on flattened pixel features.
 
 ---
 
-## 7. Explainability with Grad-CAM
+## Streamlit App
 
-Grad-CAM visualizations are generated to interpret CNN predictions by highlighting important image regions responsible for classification decisions.
+**Live:** [skin-cancer-ham10000.streamlit.app](https://skin-cancer-ham10000.streamlit.app)
 
-Features include:
-
-- Heatmap generation
-- Overlay visualization
-- Class-specific attention mapping
-
----
-
-## 8. Baseline Machine Learning Comparison
-
-The CNN model is compared against traditional ML algorithms trained on flattened pixel features:
-
-- Logistic Regression
-- Random Forest
-- K-Nearest Neighbors (KNN)
+Features:
+- Upload dermoscopy images (JPG/PNG)
+- Predicted class with confidence score
+- Probability bar chart across all 7 classes
+- Per-class descriptions and nature (benign/malignant)
 
 ---
 
-# Streamlit Web Application
-
-An interactive Streamlit application is provided for real-time prediction.
-
-### Features
-
-- Upload dermatoscopic skin lesion images
-- Predict lesion category
-- Display confidence score
-- Probability breakdown for all classes
-- User-friendly interface
-
----
-
-# Installation
-
-Install the required dependencies:
+## Installation
 
 ```bash
-pip install kaggle tensorflow scikit-learn pandas numpy matplotlib seaborn pillow opencv-python-headless streamlit
+pip install -r requirements.txt
 ```
 
----
-
-# Usage
-
-## Train the Model
-
-Run all notebook cells sequentially to:
-
-1. Load dataset
-2. Train the CNN
-3. Evaluate the model
-4. Save the best model
-
----
-
-## Launch the Streamlit App
+Place `skin_cancer_model.keras` in the project root, then:
 
 ```bash
 streamlit run app.py
@@ -237,40 +147,19 @@ streamlit run app.py
 
 ---
 
-# Requirements
+## Requirements
 
-```text
-streamlit==1.28.0
-tensorflow==2.13.0
-numpy==1.24.0
-Pillow==10.0.0
-opencv-python-headless==4.8.0
+```
+streamlit>=1.28.0
+tensorflow-cpu>=2.13.0
+numpy>=1.24.0,<2.0.0
+Pillow>=10.0.0
+plotly>=5.18.0
+huggingface-hub>=0.20.0
 ```
 
 ---
 
-# Technologies Used
+## Technologies
 
-- Python
-- TensorFlow / Keras
-- NumPy
-- Pandas
-- Scikit-learn
-- OpenCV
-- Matplotlib
-- Seaborn
-- Streamlit
-
----
-
-# Project Features
-
-✔ Deep Learning-based Skin Lesion Classification  
-✔ Custom CNN Architecture  
-✔ Data Augmentation  
-✔ Model Explainability using Grad-CAM  
-✔ Baseline ML Comparisons  
-✔ Streamlit Deployment  
-✔ End-to-End ML Pipeline
-
-
+Python · TensorFlow/Keras · NumPy · Pandas · Scikit-learn · OpenCV · Matplotlib · Seaborn · Streamlit · Hugging Face Hub
