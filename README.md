@@ -6,6 +6,19 @@ A deep learning project that classifies dermatoscopic skin lesion images into **
 
 ---
 
+## Screenshots
+
+### Empty State — Lesion Reference
+![UI](screenshots/UI.png)
+
+### Prediction — Actinic Keratoses
+![Actinic Keratoses](screenshots/AK.png)
+
+### Prediction — Benign Keratosis
+![Benign Keratosis](screenshots/BK.png)
+
+---
+
 ## Overview
 
 This project implements a complete deep learning pipeline for **skin lesion classification** using a custom **Convolutional Neural Network (CNN)**. The system assists in identifying potentially malignant skin lesions by learning visual patterns from dermatoscopic images.
@@ -127,9 +140,11 @@ CNN compared against Logistic Regression, Random Forest, and KNN on flattened pi
 
 Features:
 - Upload dermoscopy images (JPG/PNG)
-- Predicted class with confidence score
+- Predicted class with confidence score and ICD code
+- Runner-up class and confidence margin metrics
 - Probability bar chart across all 7 classes
-- Per-class descriptions and nature (benign/malignant)
+- Full per-class probability breakdown
+- Lesion reference guide with benign/malignant classification
 
 ---
 
