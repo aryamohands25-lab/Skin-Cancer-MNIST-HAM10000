@@ -1,4 +1,4 @@
-# Skin Cancer Classification System
+# Skin Cancer Classification system
 
 A deep learning project that classifies dermatoscopic skin lesion images into **7 diagnostic categories** using the **HAM10000 dataset**, with an interactive **Streamlit web application** for inference and prediction visualization.
 
